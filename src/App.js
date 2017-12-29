@@ -20,24 +20,41 @@ class App extends Component {
 
   /**** Parsing data from file for the Country Map Chart ****/
   handleCountryMap () {
-      const dataCall = require('./json_data/country.json');
-      let countryData = this.state.countryData;
-      dataCall.forEach( (e) => {
-        const data = {};
-        data.country = e.country;
-        data.cdn = parseInt(e.cdn, 10);
-        // data.p2p = parseInt(e.p2p, 10);
-        // data.total = parseInt(e.total, 10);
-        let tmpData = [];
-        for (var key in data){
-          tmpData.push(data[key]);
-        }
-        countryData.push(tmpData);
+      // const dataCall = require('./json_data/country.json');
+      // let countryData = this.state.countryData;
+      // dataCall.forEach( (e) => {
+      //   const data = {};
+      //   data.country = e.country;
+      //   data.cdn = parseInt(e.cdn, 10);
+      //   // data.p2p = parseInt(e.p2p, 10);
+      //   // data.total = parseInt(e.total, 10);
+      //   let tmpData = [];
+      //   for (var key in data){
+      //     tmpData.push(data[key]);
+      //   }
+      //   countryData.push(tmpData);
+      // });
+      $.getJSON('http://127.0.0.1:8000/src/json_data/country.json', (dataCall) => {
+            let countryData = this.state.countryData;
+            this.setState({
+              countryData: this.state.countryData,
+            });
+            dataCall.forEach( (e) => {
+              const data = {};
+              data.country = e.country;
+              data.cdn = parseInt(e.cdn, 10);
+              // data.p2p = parseInt(e.p2p, 10);
+              // data.total = parseInt(e.total, 10);
+              let tmpData = [];
+              for (var key in data){
+                tmpData.push(data[key]);
+              }
+              countryData.push(tmpData);
+            });
       });
-
       /**** Testing json logs / Data structure ****/
       // console.log("Country full Json", dataCall);
-      // console.log(this.state.countryData);
+      console.log("Country data", this.state.countryData);
   }
 
   /**** Parsing data from file for the Platform Pie Chart ****/
@@ -105,9 +122,6 @@ class App extends Component {
       // this.setState({
       //     streamData: this.state.streamData,
       // });
-
-
-
 
       function stringTrim (string) {
           const trimedString = string.split('.');
