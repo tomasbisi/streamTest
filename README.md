@@ -4,14 +4,16 @@ This is a Data Visualization Dashboard made in REACT JS for monitoring stream an
 
 On a Terminal run the following code:
 ```
-git clone https://github.com/tomasbisi/streamTest && \
-cd  streamTest && \
-npm install
-```
+# Clone the repository
+git clone https://github.com/tomasbisi/streamTest
+cd streamTest
 
-Once installed, run:
-```
+# Build dependencies
+npm install
+
+# Launch app
 npm start
+
 ```
 
 The client will run on port 3000. Copy the following url in your browser:
