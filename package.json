@@ -10,6 +10,7 @@
     "react-bootstrap": "^0.31.5",
     "react-dom": "^16.2.0",
     "react-highcharts": "^15.0.0",
+    "react-highlight": "^0.10.0",
     "react-scripts": "1.0.17"
   },
   "scripts": {

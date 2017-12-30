@@ -2,10 +2,8 @@ import React, { Component } from 'react';
 import { Navbar} from 'react-bootstrap';
 import ReactHighcharts from 'react-highcharts';
 import ReactHighmaps from 'react-highcharts/ReactHighmaps';
-import Highcharts from 'highcharts';
-import $ from 'jquery';
-// import maps from 'maps';
 import './App.css';
+const maps = require('./map_data/mapdata.js');
 
 class App extends Component {
 
@@ -22,18 +20,14 @@ class App extends Component {
   /**** Parsing data from file for the Country Map Chart ****/
   handleCountryMap () {
       const dataCall = require('./json_data/country.json');
-      let countryData = this.state.countryData;
-      dataCall.forEach( (e) => {
+      const countryData = dataCall.map((element) => {
         const data = {};
-        data.country = e.country;
-        data.cdn = parseInt(e.cdn, 10);
-        // data.p2p = parseInt(e.p2p, 10);
-        // data.total = parseInt(e.total, 10);
-        let tmpData = [];
-        for (var key in data){
-          tmpData.push(data[key]);
-        }
-        countryData.push(tmpData);
+        data['hc-key'] = element.country.toLowerCase();
+        data.value = parseInt(element.percentage, 10);
+        return data;
+      });
+      this.setState({
+          countryData: countryData,
       });
 
       console.log("Country Data", this.state.countryData);
@@ -160,6 +154,30 @@ class App extends Component {
   /**** Map Chart Builder ****/
   buildMapChart () {
       const config = {
+        title : {
+            text : 'Highmaps properties demo'
+        },
+
+        colorAxis: {
+            min: 0 // enable colorAxis
+        },
+
+        series : [{
+            data : this.state.countryData,
+            mapData: maps,
+            joinBy: 'hc-key',
+            tooltip: {
+                headerFormat: '',
+                pointFormat: '{point.name}: <b>{point.value}</b>'
+            },
+            dataLabels: {
+                enabled: false,
+                formatter: function () {
+                    // Access the hc-key property of this point
+                    return this.point.properties['hc-key'];
+                }
+            }
+        }]
 
       }
       return config;
@@ -278,11 +296,10 @@ class App extends Component {
             </Navbar>
 
            <div id="charts">
+              <div id="mapChart"><ReactHighmaps config={this.buildMapChart()} /></div>
               <div id="pieChart"><ReactHighcharts config={this.buildPieChart()} /></div>
               <div id="statsChart"><ReactHighcharts config={this.buildPlatformStatsChart()} /></div>
               <div id="streamChart"><ReactHighcharts config={this.buildStreamChart()} /></div>
-              <div id="mapChart"><ReactHighmaps config={this.buildMapChart()} /></div>
-
            </div>
       </div>
     );
