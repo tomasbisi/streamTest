@@ -3,8 +3,10 @@ import { Navbar} from 'react-bootstrap';
 import ReactHighcharts from 'react-highcharts';
 import ReactHighmaps from 'react-highcharts/ReactHighmaps';
 import './App.css';
-const maps = require('./map_data/mapdata.js');
-const toMb = 1048576;
+import $ from 'jquery';
+
+const maps = require('./map_data/mapdata.js'); // Import world map for builder function
+const toMb = 1048576; // Conversion from Bytes to Megabytes
 
 class App extends Component {
 
@@ -21,57 +23,64 @@ class App extends Component {
   /**** Parsing data from file for the Country Map Chart ****/
   handleCountryMap () {
 
-      const dataCall = require('./json_data/country.json');
-      const countryData = dataCall.map((element) => {
-        const data = {};
-        data['hc-key'] = element.country.toLowerCase();
-        data.value = parseFloat((element.total / toMb).toFixed(2), 10)
-        return data;
+      /** Extract data from json, new array with desired params and required data structure  **/
+      $.getJSON('http://127.0.0.1:8000/src/json_data/country.json', (dataCall) => {
+          const countryData = dataCall.map((element) => {
+            const data = {};
+            data['hc-key'] = element.country.toLowerCase();
+            data.value = parseFloat((element.total / toMb).toFixed(2), 10)
+            return data;
+          });
+          this.setState({
+              countryData: countryData,
+          });
       });
-      this.setState({
-          countryData: countryData,
-      });
-
       // console.log("Country Data", this.state.countryData);
   }
 
   /**** Parsing data from file for the Platform Pie Chart ****/
   handlePlatformPie () {
-    const dataCall = require('./json_data/platform.json');
-    let platformData = this.state.platformData;
-    this.setState({
-        platformData: this.state.platformData,
-    });
-    dataCall.forEach( (e) => {
-        const data = {};
-        data.platform = e.platform;
-        data.trafficPercentage = parseInt(e.trafficPercentage, 10);
-        let tmpData = [];
-        for (var key in data){
-          tmpData.push(data[key]);
-        }
-        platformData.push(tmpData);
+
+    /** Extract data from json, new array with desired params and required data structure  **/
+    $.getJSON('http://127.0.0.1:8000/src/json_data/platform.json', (dataCall) => {
+        let platformData = this.state.platformData;
+        dataCall.forEach( (e) => {
+            const data = {};
+            data.platform = e.platform;
+            data.trafficPercentage = parseInt(e.trafficPercentage, 10);
+            let tmpData = [];
+            for (var key in data){
+              tmpData.push(data[key]);
+            }
+            platformData.push(tmpData);
+        });
+        this.setState({
+            platformData: this.state.platformData,
+        });
     });
       // console.log("Platform data", this.state.platformData);
   }
 
   /**** Parsing data from file for the Platform Stats Chart ****/
   handlePlatformStats () {
-    const dataCall = require('./json_data/platform.json');
-    let platformStats = this.state.platformStats;
-    this.setState({
-          platformStats: this.state.platformStats,
-    });
-    dataCall.forEach( (e) => {
-        platformStats.push({
-          name: e.platform,
-          data: [
-            parseFloat((e.cdn / toMb).toFixed(2), 10),
-            parseFloat((e.p2p / toMb).toFixed(2), 10),
-            parseFloat((e.upload / toMb).toFixed(2), 10)
-          ],
+
+    /** Extract data from json, new array with desired params and required data structure  **/
+    $.getJSON('http://127.0.0.1:8000/src/json_data/platform.json', (dataCall) => {
+        let platformStats = this.state.platformStats;
+        dataCall.forEach( (e) => {
+            platformStats.push({
+              name: e.platform,
+              data: [
+                parseFloat((e.cdn / toMb).toFixed(2), 10),
+                parseFloat((e.p2p / toMb).toFixed(2), 10),
+                parseFloat((e.upload / toMb).toFixed(2), 10)
+              ],
+            });
         });
-    });
+        this.setState({
+              platformStats: this.state.platformStats,
+        });
+      });
       // console.log("Stats Data", this.state.platformStats);
   }
 
@@ -82,6 +91,7 @@ class App extends Component {
       const dictionary = {};
       function stringTrim (string) {
           const trimedString = string.split('.')[0];
+          /** if the string key is repeated, add a 1 to the name **/
           let finalString;
           if (dictionary[trimedString]) {
               dictionary[trimedString] += 1;
@@ -94,29 +104,26 @@ class App extends Component {
           return finalString;
       }
 
-      const dataCall = require('./json_data/streams.json');
-      let streamData = this.state.streamData;
-      this.setState({
-            streamData: this.state.streamData,
-      });
-      dataCall.forEach( (e) => {
-          streamData.push({
-            name: stringTrim(e.manifest),
-            data: [
-              parseFloat((e.cdn / toMb).toFixed(2), 10),
-              parseFloat((e.p2p / toMb).toFixed(2), 10),
-              parseFloat((e.total / toMb).toFixed(2), 10)
-            ],
-          });
+      /** Extract data from json, new array with desired params and required data structure  **/
+        $.getJSON('http://127.0.0.1:8000/src/json_data/streams.json', (dataCall) => {
+           let streamData = this.state.streamData;
+           dataCall.forEach( (e) => {
+               streamData.push({
+                 name: stringTrim(e.manifest),
+                 data: [(e.cdn / toMb), (e.p2p / toMb), (e.total / toMb)],
+               });
+           });
+           this.setState({
+               streamData: this.state.streamData,
+           });
         });
-
       // console.log("Stream Data", this.state.streamData);
   }
 
   /**** Pie Chart Builder ****/
   buildPieChart () {
 
-    let config = {
+    const config = {
         chart: {
             plotBackgroundColor: null,
             plotBorderWidth: null,
@@ -153,36 +160,35 @@ class App extends Component {
 
   /**** Map Chart Builder ****/
   buildMapChart () {
-      const config = {
-        title : {
-            text : 'World Wide Total Traffic'
-        },
+    const config = {
+      title : {
+          text : 'World Wide Total Traffic'
+      },
 
-        colorAxis: {
-            min: 0
-        },
-        credits: {
-            enabled: false
-        },
-        series : [{
-            data : this.state.countryData,
-            mapData: maps,
-            joinBy: 'hc-key',
-            tooltip: {
-                headerFormat: '',
-                pointFormat: '{point.name}: <b>{point.value} MB</b>'
-            },
-            dataLabels: {
-                enabled: false,
-                formatter: function () {
-                    /** Access hc-key property of this point **/
-                    return this.point.properties['hc-key'];
-                }
-            }
-        }]
-
-      }
-      return config;
+      colorAxis: {
+          min: 0
+      },
+      credits: {
+          enabled: false
+      },
+      series : [{
+          data : this.state.countryData,
+          mapData: maps,
+          joinBy: 'hc-key',
+          tooltip: {
+              headerFormat: '',
+              pointFormat: '{point.name}: <b>{point.value} MB</b>'
+          },
+          dataLabels: {
+              enabled: false,
+              formatter: function () {
+                  /** Access hc-key property of this point **/
+                  return this.point.properties['hc-key'];
+              }
+          }
+      }]
+    }
+    return config;
   }
 
   /**** Stack Chart Builder ****/
@@ -263,7 +269,6 @@ class App extends Component {
                 connectorAllowed: false
             },
             showInLegend: false,
-
         }
     },
     credits: {
