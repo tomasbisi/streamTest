@@ -4,6 +4,7 @@ import ReactHighcharts from 'react-highcharts';
 import ReactHighmaps from 'react-highcharts/ReactHighmaps';
 import './App.css';
 const maps = require('./map_data/mapdata.js');
+const toMb = 1048576;
 
 class App extends Component {
 
@@ -19,18 +20,19 @@ class App extends Component {
 
   /**** Parsing data from file for the Country Map Chart ****/
   handleCountryMap () {
+
       const dataCall = require('./json_data/country.json');
       const countryData = dataCall.map((element) => {
         const data = {};
         data['hc-key'] = element.country.toLowerCase();
-        data.value = parseInt(element.percentage, 10);
+        data.value = parseFloat((element.total / toMb).toFixed(2), 10)
         return data;
       });
       this.setState({
           countryData: countryData,
       });
 
-      console.log("Country Data", this.state.countryData);
+      // console.log("Country Data", this.state.countryData);
   }
 
   /**** Parsing data from file for the Platform Pie Chart ****/
@@ -56,7 +58,6 @@ class App extends Component {
   /**** Parsing data from file for the Platform Stats Chart ****/
   handlePlatformStats () {
     const dataCall = require('./json_data/platform.json');
-    const toMb = 1048576;
     let platformStats = this.state.platformStats;
     this.setState({
           platformStats: this.state.platformStats,
@@ -93,22 +94,21 @@ class App extends Component {
           return finalString;
       }
 
-        const dataCall = require('./json_data/streams.json');
-        const toMb = 1048576;
-        let streamData = this.state.streamData;
-        this.setState({
-              streamData: this.state.streamData,
-        });
-        dataCall.forEach( (e) => {
-              streamData.push({
-                name: stringTrim(e.manifest),
-                data: [
-                  parseFloat((e.cdn / toMb).toFixed(2), 10),
-                  parseFloat((e.p2p / toMb).toFixed(2), 10),
-                  parseFloat((e.total / toMb).toFixed(2), 10)
-                ],
-              });
+      const dataCall = require('./json_data/streams.json');
+      let streamData = this.state.streamData;
+      this.setState({
+            streamData: this.state.streamData,
+      });
+      dataCall.forEach( (e) => {
+          streamData.push({
+            name: stringTrim(e.manifest),
+            data: [
+              parseFloat((e.cdn / toMb).toFixed(2), 10),
+              parseFloat((e.p2p / toMb).toFixed(2), 10),
+              parseFloat((e.total / toMb).toFixed(2), 10)
+            ],
           });
+        });
 
       // console.log("Stream Data", this.state.streamData);
   }
@@ -155,25 +155,27 @@ class App extends Component {
   buildMapChart () {
       const config = {
         title : {
-            text : 'Highmaps properties demo'
+            text : 'World Wide Total Traffic'
         },
 
         colorAxis: {
-            min: 0 // enable colorAxis
+            min: 0
         },
-
+        credits: {
+            enabled: false
+        },
         series : [{
             data : this.state.countryData,
             mapData: maps,
             joinBy: 'hc-key',
             tooltip: {
                 headerFormat: '',
-                pointFormat: '{point.name}: <b>{point.value}</b>'
+                pointFormat: '{point.name}: <b>{point.value} MB</b>'
             },
             dataLabels: {
                 enabled: false,
                 formatter: function () {
-                    // Access the hc-key property of this point
+                    /** Access hc-key property of this point **/
                     return this.point.properties['hc-key'];
                 }
             }
@@ -190,7 +192,7 @@ class App extends Component {
             type: 'column'
         },
         title: {
-            text: 'Streaming Analytics'
+            text: 'Service Streaming Analytics'
         },
         xAxis: {
             categories: [
