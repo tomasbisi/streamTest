@@ -22,24 +22,36 @@
   font-size: large;
 }
 
-
 #pieChart {
-  width: 600px !important;
-  height: 400px !important;
+  border: 1px solid rgb(230, 230, 230);
+  box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+  width: 550px !important;
+  height: 420px !important;
   float: right !important;
+  margin-right: 40px;
 }
 
 #statsChart {
-  width: 600px !important;
-  height: 400px !important;
+  border: 1px solid rgb(230, 230, 230);
+  box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+  width: 550px !important;
+  height: 420px !important;
+  margin-left: 40px;
+
 }
 
 #streamChart {
-  padding-top: 50px !important;
+  border: 1px solid rgb(230, 230, 230);
+  box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);  
+  padding-left: 0px;
+  margin: auto;
+  margin-top: 30px;
+  width: 1200px;
 }
 
 #mapChart {
-  padding-top: 50px !important;
+  padding-top: 70px !important;
+  margin: auto;
 }
 
 #toolTipSize {
