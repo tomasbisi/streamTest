@@ -1,7 +1,8 @@
 import React, { Component } from 'react';
-import { Nav, Navbar, NavDropdown, MenuItem} from 'react-bootstrap';
+import { Navbar} from 'react-bootstrap';
 import ReactHighcharts from 'react-highcharts';
 import ReactHighmaps from 'react-highcharts/ReactHighmaps';
+import Highcharts from 'highcharts';
 import $ from 'jquery';
 // import maps from 'maps';
 import './App.css';
@@ -12,10 +13,11 @@ class App extends Component {
     super();
     this.state = {
         platformData: [],
+        platformStats: [],
         countryData: [],
         streamData: [],
     };
-    this.buildPieChart = this.buildPieChart.bind(this);
+    // this.buildPieChart = this.buildPieChart.bind(this);
   }
 
   /**** Parsing data from file for the Country Map Chart ****/
@@ -54,17 +56,12 @@ class App extends Component {
       });
       /**** Testing json logs / Data structure ****/
       // console.log("Country full Json", dataCall);
-      console.log("Country data", this.state.countryData);
+      console.log("Country Data", this.state.countryData);
   }
 
   /**** Parsing data from file for the Platform Pie Chart ****/
   handlePlatformPie () {
-      // const dataCall = require('./json_data/platform.json');
-      // let platformData = this.state.platformData;
 
-      // this.setState({
-      //     platformData: this.state.platformData,
-      // });
       $.getJSON('http://127.0.0.1:8000/src/json_data/platform.json', (response) => {
 
           response.forEach( (e) => {
@@ -80,48 +77,78 @@ class App extends Component {
                 tmpData.push(data[key]);
               }
               platformData.push(tmpData);
-              // console.log(tmpData);
           });
-
       });
-
-      // dataCall.forEach((e) => {
-      //     const data = {};
-      //     data.platform = e.platform;
-      //     data.trafficPercentage = parseInt(e.trafficPercentage, 10);
-      //     let tmpData = [];
-      //     for (var key in e){
-      //       tmpData.push(e[key]);
-      //     }
-      //     platformData.push(tmpData);
-      // });
-
-
-      // let jsonData = $.getJSON('http://127.0.0.1:8000/src/json_data/platform.json', (dataCall) => {
-      //        return dataCall;
-          // dataCall.forEach((e) => {
-          //   const data = {};
-          //   data.platform = e.platform;
-          //   data.trafficPercentage = parseInt(e.trafficPercentage, 10);
-          //   let tmpData = [];
-          //   for (var key in e){
-          //     tmpData.push(e[key]);
-          //   }
-          //   platformData.push(tmpData);
-          // });
-      // });
       /**** Testing json logs / Data structure ****/
       // console.log("Platform full Json", dataCall);
       console.log("Platform data", this.state.platformData);
   }
 
-  handleStreamStack () {
-      // const dataCall = require('./json_data/streams.json');
-      // let streamData = this.state.streamData;
+  /**** Parsing data from file for the Platform Stats Chart ****/
+  handlePlatformStats () {
 
-      // this.setState({
-      //     streamData: this.state.streamData,
+      // $.ajax({
+      //     dataType: 'json',
+      //     type: 'GET',
+      //     url: 'http://127.0.0.1:8000/src/json_data/platform.json',
+      //     success: (data) => {
+      //         const toMb = 1048576;
+      //         data.forEach( (e) => {
+      //             let platformStats = this.state.platformStats;
+      //             this.setState({
+      //                 platformStats: this.state.platformStats,
+      //             });
+      //             platformStats.push({
+      //               name: e.platform,
+      //               data: [
+      //                 parseFloat((e.cdn / toMb).toFixed(2), 10),
+      //                 parseFloat((e.p2p / toMb).toFixed(2), 10),
+      //                 parseFloat((e.upload / toMb).toFixed(2), 10)
+      //               ],
+      //             });
+      //         });
+      //     }
       // });
+      $.getJSON('http://127.0.0.1:8000/src/json_data/platform.json', (dataCall) => {
+          const toMb = 1048576;
+
+          dataCall.forEach( (e) => {
+              let platformStats = this.state.platformStats;
+              this.setState({
+                  platformStats: this.state.platformStats,
+              });
+              platformStats.push({
+                name: e.platform,
+                data: [
+                  parseFloat((e.cdn / toMb).toFixed(2), 10),
+                  parseFloat((e.p2p / toMb).toFixed(2), 10),
+                  parseFloat((e.upload / toMb).toFixed(2), 10)
+                ],
+              });
+          });
+      });
+
+        // const dataCall = require('./json_data/platform.json');
+        // const toMb = 1048576;
+        // let platformStats = this.state.platformStats;
+        // this.setState({
+        //       platformStats: this.state.platformStats,
+        // });
+        // dataCall.forEach( (e) => {
+        //       platformStats.push({
+        //         name: e.platform,
+        //         data: [
+        //           parseFloat((e.cdn / toMb).toFixed(2), 10),
+        //           parseFloat((e.p2p / toMb).toFixed(2), 10),
+        //           parseFloat((e.upload / toMb).toFixed(2), 10)
+        //         ],
+        //       });
+        // });
+        /**** Testing json logs / Data structure ****/
+      console.log("Stats Data", this.state.platformStats);
+  }
+  /**** Parsing data from file for the Streaming Stats Chart ****/
+  handleStreamStack () {
 
       function stringTrim (string) {
           const trimedString = string.split('.');
@@ -154,59 +181,51 @@ class App extends Component {
           //   } else {
           //     obj[key] = obj[key];
           //   }
-
-
           return newString;
             // console.log(obj);
             // console.log("result", result[0]);
             // console.log(newString[i], typeof(newString));
       }
-          // const conversion = 1048576; // Conversion form bytes to megabytes
-          // dataCall.forEach( (e) => {
-          //     streamData.push({
-          //       name: e.manifest,
-          //       data: [(e.cdn / conversion), (e.p2p / conversion), (e.total / conversion)],
-          //     });
-          // });
 
-      $.getJSON('http://127.0.0.1:8000/src/json_data/streams.json', (dataCall) => {
-          const conversion = 1048576; // Conversion form bytes to megabytes
-          let streamData = this.state.streamData;
-          this.setState({
+      // $.getJSON('http://127.0.0.1:8000/src/json_data/streams.json', (dataCall) => {
+
+      //     const toMb = 1048576;
+      //     dataCall.forEach( (e) => {
+      //         let streamData = this.state.streamData;
+      //         this.setState({
+      //             streamData: this.state.streamData,
+      //         });
+      //         streamData.push({
+      //           name: stringTrim(e.manifest),
+      //           data: [
+      //             parseFloat((e.cdn / toMb).toFixed(2), 10),
+      //             parseFloat((e.p2p / toMb).toFixed(2), 10),
+      //             parseFloat((e.total / toMb).toFixed(2), 10)
+      //           ],
+      //         });
+      //     });
+      // });
+        const dataCall = require('./json_data/streams.json');
+        const toMb = 1048576;
+        let streamData = this.state.streamData;
+        this.setState({
               streamData: this.state.streamData,
-          });
-
-          dataCall.forEach( (e) => {
+        });
+        dataCall.forEach( (e) => {
               streamData.push({
                 name: stringTrim(e.manifest),
-                data: [(e.cdn / conversion), (e.p2p / conversion), (e.total / conversion)],
+                data: [
+                  parseFloat((e.cdn / toMb).toFixed(2), 10),
+                  parseFloat((e.p2p / toMb).toFixed(2), 10),
+                  parseFloat((e.total / toMb).toFixed(2), 10)
+                ],
               });
           });
 
-          // dataCall.forEach( (e) => {
-          //     let data = {};
-          //     let tmpData = [];
-          //     data.manifest = e.manifest;
-          //     data.cdn = e.cdn;
-          //     data.p2p = e.p2p;
-          //     data.total = e.total;
-          //     for (var key in data){
-          //       tmpData.push({
-          //         name: stringTrim(data.manifest),
-          //         data: [(data.cdn / conversion), (data.p2p / conversion), (data.total / conversion)],
-          //       });
-          //   }
-          //   streamData.push(tmpData);
-          //   // console.log("temp data", data);
-          // });
-
-      });
-
         /**** Testing json logs / Data structure ****/
-      // console.log("Platform full Json", dataCall);
       console.log("Stream Data", this.state.streamData);
 
-    }
+  }
 
 
   /**** Pie Chart Builder ****/
@@ -220,7 +239,7 @@ class App extends Component {
             type: 'pie'
         },
         title: {
-            text: 'Platform Usage'
+            text: 'Device Usage'
         },
         tooltip: {
             pointFormat: '{series.name}: <b>{point.percentage:.1f}%</b>'
@@ -232,8 +251,11 @@ class App extends Component {
                 dataLabels: {
                     enabled: false
                 },
-                showInLegend: true
+                showInLegend: true,
             }
+        },
+        credits: {
+            enabled: false
         },
         series: [{
             name: "Traffic Percentage",
@@ -241,8 +263,6 @@ class App extends Component {
             data: this.state.platformData,
         }]
     }
-    // console.log("test!");
-    // return (<div><ReactHighcharts config={config}/></div>);
     return config;
   }
 
@@ -279,6 +299,9 @@ class App extends Component {
 
               }
             },
+            credits: {
+                enabled: false
+            },
 
             series: [{
               name: 'UTC',
@@ -294,16 +317,13 @@ class App extends Component {
   }
 
   /**** Stack Chart Builder ****/
-  buildStackChart () {
+  buildStreamChart () {
     const config = {
         chart: {
             type: 'column'
         },
         title: {
-            text: 'Analytics'
-        },
-        subtitle: {
-            text: ''
+            text: 'Streaming Analytics'
         },
         xAxis: {
             categories: [
@@ -316,13 +336,13 @@ class App extends Component {
         yAxis: {
             min: 0,
             title: {
-                text: 'Amount of MB'
+                text: 'Amount of MegaBytes'
             }
         },
         tooltip: {
             headerFormat: '<span style="font-size:10px">{point.key}</span><table>',
-            pointFormat: '<tr><td style="color:{series.color};padding:0">{series.name}: </td>' +
-                '<td style="padding:0"><b>{point.y:.0f} MB</b></td></tr>',
+            pointFormat: '<tr id="toolTipSize"><td style="color:{series.color};padding:0">{series.name}: </td>' +
+                '<td style="padding:0"><b>{point.y:.2f} MB</b></td></tr>',
             footerFormat: '</table>',
             shared: true,
             useHTML: true,
@@ -335,18 +355,63 @@ class App extends Component {
                 showInLegend: false,
             }
         },
-        series: this.state.streamData
+        credits: {
+            enabled: false
+        },
+         series: this.state.streamData,
       }
       return config;
+  }
+
+  buildPlatformStatsChart () {
+    const config = {
+
+    title: {
+        text: 'Device Stats'
+    },
+    xAxis: {
+            categories: [
+                'CDN',
+                'P2P',
+                'Upload'
+            ],
+            crosshair: true
+    },
+    yAxis: {
+        title: {
+            text: 'Values in MegaBytes'
+        }
+    },
+    legend: {
+        layout: 'vertical',
+        align: 'right',
+        verticalAlign: 'middle'
+    },
+    plotOptions: {
+        series: {
+            label: {
+                connectorAllowed: false
+            },
+            showInLegend: false,
+
+        }
+    },
+    credits: {
+        enabled: false
+    },
+    tooltip: {
+        pointFormat: '{series.name}: <b>{point.y:.2f} MB</b>'
+    },
+    series: this.state.platformStats,
+    }
+    return config;
   }
 
   componentDidMount() {
     this.handlePlatformPie();
     this.handleCountryMap();
     this.handleStreamStack();
-    this.buildPieChart();
-    this.buildMapChart();
-    this.buildStackChart();
+    this.handlePlatformStats();
   }
 
   render() {
@@ -356,24 +421,17 @@ class App extends Component {
             <Navbar inverse collapseOnSelect>
               <Navbar.Header>
                 <Navbar.Brand>
-                  <a>StreamTest</a>
+                  <a>Stream Statistics Dashboard</a>
                 </Navbar.Brand>
                 <Navbar.Toggle />
               </Navbar.Header>
-              <Navbar.Collapse>
-                <Nav>
-                  <NavDropdown title="Statistics" id="basic-nav-dropdown">
-                    <MenuItem>Platforms</MenuItem>
-                    <MenuItem>Streaming</MenuItem>
-                  </NavDropdown>
-                </Nav>
-              </Navbar.Collapse>
             </Navbar>
 
-           <div>
-              <ReactHighcharts config={this.buildPieChart()} />
-              <ReactHighcharts config={this.buildStackChart()} />
-              <ReactHighmaps config={this.buildMapChart()} />
+           <div id="charts">
+              <div id="pieChart"><ReactHighcharts config={this.buildPieChart()} /></div>
+              <div id="statsChart"><ReactHighcharts config={this.buildPlatformStatsChart()} /></div>
+              <div id="streamChart"><ReactHighcharts config={this.buildStreamChart()} /></div>
+              <div id="mapChart"><ReactHighmaps config={this.buildMapChart()} /></div>
 
            </div>
       </div>
@@ -422,3 +480,35 @@ export default App;
   //     });
   //     return cleanData;
   // }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// dataCall.forEach( (e) => {
+//               let data = {};
+//               let tmpData = [];
+//               data.manifest = e.manifest;
+//               data.cdn = e.cdn;
+//               data.p2p = e.p2p;
+//               data.total = e.total;
+//               for (var key in data){
+//                 tmpData.push({
+//                   name: stringTrim(data.manifest),
+//                   data: [(data.cdn / conversion), (data.p2p / conversion), (data.total / conversion)],
+//                 });
+//             }
+//             streamData.push(tmpData);
+//             // console.log("temp data", data);
+//           });

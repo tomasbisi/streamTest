@@ -22,6 +22,34 @@
   font-size: large;
 }
 
+
+#pieChart {
+  width: 600px !important;
+  height: 400px !important;
+  float: right !important;
+}
+
+#statsChart {
+  width: 600px !important;
+  height: 400px !important;
+}
+
+#streamChart {
+  padding-top: 50px !important;
+}
+
+#mapChart {
+  padding-top: 50px !important;
+}
+
+#toolTipSize {
+  border: 2px solid rgb(0, 108, 169);
+  border-radius: 3px;
+  background-color: #ffffff;
+  padding: 5px;
+  font-size: 7px;
+}
+
 @keyframes App-logo-spin {
   from { transform: rotate(0deg); }
   to { transform: rotate(360deg); }
