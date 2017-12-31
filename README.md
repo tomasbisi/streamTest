@@ -7,6 +7,7 @@ This is a Data Visualization Dashboard made in REACT JS for monitoring stream an
 React: 16.2.0
 Python: 2.7.10
 Jquery: 3.2.1
+Node: 8.7.0
 React-highcharts: 15.0.0
 ```
 
